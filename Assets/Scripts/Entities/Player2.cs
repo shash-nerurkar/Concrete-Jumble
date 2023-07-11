@@ -16,7 +16,11 @@ public class Player2 : Hittable
         switch ( Entity.State ) {
             case EntityState.Attacking:
                 if ( transform.position.y > -Main.ScreenHeightHalved && transform.position.y < ( Main.ScreenHeightHalved * 0.66f ) - 0.5f )
-                    Entity.Throw ( startDirection: Vector2.zero );
+                    Entity.Throw (
+                        startDirection: Mathf.Abs ( Entity.main.player.transform.position.y - transform.position.y ) < 0.3f 
+                            ? Vector2.zero
+                            : new Vector2 ( 0, Mathf.Sign ( Entity.main.player.transform.position.y - transform.position.y ) )
+                    );
                 
                 destinationPosition = new Vector2 ( transform.position.x, Random.Range ( -Main.ScreenHeightHalved, ( Main.ScreenHeightHalved * 0.66f ) - 0.5f ) );
 
@@ -38,7 +42,7 @@ public class Player2 : Hittable
         switch ( Entity.State ) {
             case EntityState.Attacking:
                 if ( !attackTimer.IsRunning || attackTimer.TimeRemaining == 0 )
-                    attackTimer.StartTimer ( maxTime: Random.Range ( 0, 3 ), onTimerFinish: OnAttackTimerFinish );
+                    attackTimer.StartTimer ( maxTime: Random.Range ( 0, 2 ), onTimerFinish: OnAttackTimerFinish );
                 
                 if ( Vector2.Distance ( transform.position, destinationPosition ) > 0.1f ) {
                     Entity.Velocity = ( destinationPosition - transform.position ).normalized * Time.deltaTime;

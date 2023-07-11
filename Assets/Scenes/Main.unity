@@ -2025,8 +2025,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: You are
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e5688bbb6a6d72e468cf16e0fd13a883, type: 2}
+  m_sharedMaterial: {fileID: 8298586796937123044, guid: e5688bbb6a6d72e468cf16e0fd13a883, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7903,8 +7903,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: ROLES
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d71954c6564abc84cad0d15898352ee9, type: 2}
+  m_sharedMaterial: {fileID: 6016849056643579764, guid: d71954c6564abc84cad0d15898352ee9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8036,10 +8036,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: REVERSED!
+  m_text: REVERSED
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d71954c6564abc84cad0d15898352ee9, type: 2}
+  m_sharedMaterial: {fileID: 6016849056643579764, guid: d71954c6564abc84cad0d15898352ee9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9039,8 +9039,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Boomerang
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e5688bbb6a6d72e468cf16e0fd13a883, type: 2}
+  m_sharedMaterial: {fileID: 8298586796937123044, guid: e5688bbb6a6d72e468cf16e0fd13a883, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9071,7 +9071,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 4
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -9131,7 +9131,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 88.9, y: -129}
+  m_AnchoredPosition: {x: 110, y: -129}
   m_SizeDelta: {x: 222.1, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1338903354
@@ -11390,7 +11390,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LEVEL COMPLETE
+  m_text: 'YOU
+
+    DIED'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d71954c6564abc84cad0d15898352ee9, type: 2}
   m_sharedMaterial: {fileID: 6016849056643579764, guid: d71954c6564abc84cad0d15898352ee9, type: 2}

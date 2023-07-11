@@ -11,15 +11,10 @@ public class RoleReversalPanel : MonoBehaviour
 
 
     public void ReverseRoles ( Entity entity, Entity hitEntity, EntityState hitEntityState, Entity entityCurrentHolder ) {
-        Time.timeScale = 0;
-
-        entity.SpriteRenderer.sortingOrder = 2;
-        hitEntity.SpriteRenderer.sortingOrder = 2;
-
-        hud.soundsMain.inGameMusic.spatialBlend = 1;
-
-        hud.main.CameraAnimator.Play ( "no_move" );
-        hud.main.ParticleSystem.gameObject.SetActive ( false );
+        this.entity = entity;
+        this.hitEntity = hitEntity;
+        this.hitEntityState = hitEntityState;
+        this.entityCurrentHolder = entityCurrentHolder;
 
         Player player = FindObjectOfType<Player> ();
         switch ( player.Entity.State ) {
@@ -37,15 +32,20 @@ public class RoleReversalPanel : MonoBehaviour
                 break;
         }
 
+        Time.timeScale = 0;
+
+        entity.SpriteRenderer.sortingOrder = 2;
+        hitEntity.SpriteRenderer.sortingOrder = 2;
+
+        hud.soundsMain.inGameMusic.spatialBlend = 1;
+
+        hud.main.CameraAnimator.Play ( "no_move" );
+        hud.main.ParticleSystem.gameObject.SetActive ( false );
+
         gameObject.SetActive ( true );
-        hud.volumeButton.gameObject.SetActive ( true );
+        hud.volumeButton.gameObject.SetActive ( false );
 
         animator.SetBool ( "isReversing", true );
-
-        this.entity = entity;
-        this.hitEntity = hitEntity;
-        this.hitEntityState = hitEntityState;
-        this.entityCurrentHolder = entityCurrentHolder;
     }
 
     private Entity entity;
