@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
+using Random = UnityEngine.Random;
 
 public enum GameStates {
     InMenu,
@@ -12,13 +12,14 @@ public class Main : MonoBehaviour
     public static bool IsMuted;
     public static float ScreenHeightHalved;
     public static GameStates GameState;
-    public static int distanceFromPTTeacherText;
+    public static float PlayerHealth;
     public static float currentPlaythroughTime;
     public static Vector2 throwDirection;
-    public static bool IsWeaponMidAir;
 
     
 
+    public Animator CameraAnimator;
+    public ParticleSystem ParticleSystem;
     public SoundsMain soundsMain;
     public HUD hud;
     public GameObject GameEntities;
@@ -28,52 +29,129 @@ public class Main : MonoBehaviour
     public Weapon weapon;
 
 
-    private bool shouldDialogPlay;
-    private bool IsDialogPlaying;
-    public Dictionary<Entity, string>[] dialogsList;
-    public int currentDialogIndex = 0;
+    private bool shouldExchangePlay;
+    private bool IsExchangePlaying;
+    public String[][] exchangesList;
+    public int currentExchangeIndex;
+    public int currentDialogueIndex;
     Timer tutorialShowTimer;
+    Timer dialogTimer;
+
 
     void AddDialogs () {
-        dialogsList = new Dictionary<Entity, string>[] {
-            new Dictionary<Entity, string> {
-                { player2.Entity, "Yo man, CHILL" },
-                { referee.Entity, "Woah, he just said \"Yo mama's filled\", you gonna take that bro?" },
-                { player.Entity, "COME HERE, YOU LITTLE PRICK" },
-                { player2.Entity, "That's NOT WHAT I SAID" },
+        exchangesList = new String[][] {
+            new String[] {
+                "2:Yo Brown, CHILL, MAN, don't pass it to me",
+                "3:Haha",
+                "1:GET THIS THING OFF OF ME BLUE",
+                "2:NO",
+                "1:I DON'T WANT NOTHING TO DO WITH NO INFECTED BOOMERANGS, MAN",
+                "2:PLEASE man, TAKE the L, and KEEP THE INFECTION AWAY FROM ME",
+                "3:Finally some energy on the pavement, I LOVE it"
+            },
+            new String[] {
+                "3:ahahaha these goons",
+            },
+            new String[] {
+                "1:WE'VE KNOWN EACH OTHER FOR 7 YEARS, MAN",
+                "2:SO YOU'D RATHER LET ME DIE OVER YOU?"
+            },
+            new String[] {
+                "3:asli hai *hums*",
+            },
+            new String[] {
+                "3:heuheuheuheueheu",
+            },
+            new String[] {
+                "2:WHY ARE YOU RUNNING WITH US ANYWAY, GREEN?",
+                "3:I'm the referee, obviously",
+                "1:THIS IS A GAME TO YOU?",
+            },
+            new String[] {
+                "3:khikhikhikhi",
+            },
+            new String[] {
+                "3:bhag bhag bhag aaya sher aaya sher",
+                "2:ENOUGH WITH THE OBSCURE RAP REFERENCES"
+            },
+            new String[] {
+                "3:You guys ever heard \"We gunna run this town toniiight\" by Jay-Z?",
+                "1: PLEASE SHUT UP"
             },
         };
     }
 
-    async void PlayNextDialog () {
-        IsDialogPlaying = true;
+    void PlayNextDialog () {
+        IsExchangePlaying = true;
         
-        Dictionary<Entity, string> dialogsDict = dialogsList [ currentDialogIndex ];
+        String dialog = exchangesList [ currentExchangeIndex ] [ currentDialogueIndex ];
+        String[] subparts;
+        Entity entity;
 
-        foreach ( KeyValuePair<Entity, string> dialog in dialogsDict ) {
-            dialog.Key.ShowDialog ( dialogText: dialog.Value, millisecondsDelay: 3000 );
-            await Task.Delay ( millisecondsDelay: 3000 );
+
+        if ( currentDialogueIndex > 0 ) {
+            subparts = exchangesList [ currentExchangeIndex ] [ currentDialogueIndex - 1 ].Split( ":" );
+            switch ( subparts[ 0 ] )  {
+                case "1":
+                    entity = player.Entity;
+                    break;
+                
+                case "2":
+                    entity = player2.Entity;
+                    break;
+                
+                default:
+                case "3":
+                    entity = referee.Entity;
+                    break;
+            }
+            entity.ToggleDialog ( shouldShow: false, dialogText: null );
         }
 
-        currentDialogIndex = ( currentDialogIndex < dialogsList.Length - 1 ) ? ( currentDialogIndex + 1 ) : 0;
 
-        IsDialogPlaying = false;
+        subparts = dialog.Split(":");
+        switch ( subparts[ 0 ] )  {
+            case "1":
+                entity = player.Entity;
+                break;
+            
+            case "2":
+                entity = player2.Entity;
+                break;
+            
+            default:
+            case "3":
+                entity = referee.Entity;
+                break;
+        }
+        entity.ToggleDialog ( shouldShow: true, dialogText: subparts[ 1 ] );
+
+
+        if ( currentDialogueIndex == exchangesList [ currentExchangeIndex ].Length - 1 ) {
+            currentDialogueIndex = 0;
+            currentExchangeIndex = ( currentExchangeIndex < exchangesList.Length - 1 ) ? ( currentExchangeIndex + 1 ) : 1;
+            IsExchangePlaying = false;
+        }
+        else {
+            currentDialogueIndex++;
+            dialogTimer.StartTimer ( maxTime: 7, onTimerFinish: PlayNextDialog );
+        }
     }
 
-    void Awake () {
-        shouldDialogPlay = true;
-        IsMuted = false;
-        ScreenHeightHalved = ( Camera.main.orthographicSize * Screen.width / Screen.height ) / 2;
 
-        Entity.OnEntityHitAction += ChangeThrowDirection;
+    void Awake () {
+        shouldExchangePlay = true;
+        IsMuted = false;
+        ScreenHeightHalved = ( Camera.main.orthographicSize * Screen.width / Screen.height ) / 2 - 0.3f;
 
         tutorialShowTimer = gameObject.AddComponent<Timer> ();
+        dialogTimer = gameObject.AddComponent<Timer> ();
 
         AddDialogs ();
         
         SetNewGameParams ();
 
-        // StartGame();
+        soundsMain.inGameMusic.Play ();
         StartMenu ();
     }
 
@@ -81,28 +159,23 @@ public class Main : MonoBehaviour
         if ( GameState == GameStates.InGame ) {
             currentPlaythroughTime += Time.deltaTime;
 
-            if( !IsDialogPlaying ) {
-                if ( shouldDialogPlay )
+            SetDifficulty ();
+
+            if( !IsExchangePlaying ) {
+                if ( shouldExchangePlay )
                     PlayNextDialog ();
                 
-                shouldDialogPlay = Random.Range ( 0, 1 ) > 0.95f;
+                shouldExchangePlay = Random.Range ( 0, 1 ) > 0.75f;
             }
         }
     }
 
-    void SetNewGameParams () {
-        distanceFromPTTeacherText = 5;
-        currentPlaythroughTime = 0;
-        throwDirection = Vector2.right;
-        IsDialogPlaying = false;
-        IsWeaponMidAir = false;
-    }
 
     public void StartGame () {
         GameState = GameStates.InGame;
 
-        soundsMain.uiMusic.Stop ();
-        soundsMain.inGameMusic.Play ();
+        if ( !soundsMain.inGameMusic.isPlaying )
+            soundsMain.inGameMusic.Play ();
 
         hud.InGameHUD.SetActive ( true );
         hud.PausePanel.SetActive ( false );
@@ -122,9 +195,6 @@ public class Main : MonoBehaviour
     public void StartMenu () {
         GameState = GameStates.InMenu;
 
-        soundsMain.uiMusic.Play ();
-        soundsMain.inGameMusic.Stop ();
-
         ResetGameEntities ();
 
         hud.InGameHUD.SetActive ( false );
@@ -135,49 +205,136 @@ public class Main : MonoBehaviour
         hud.MainMenu.SetActive ( true );
 
         player.DisableActions ();
-        hud.SetScrolling ( scrollSpeed: Vector2.zero );
-    }
-
-    void ResetGameEntities () {
-        player.transform.SetParent ( GameEntities.transform );
-        player.Entity.ChangeState ( EntityState.Attacking );
-        player.Entity.Canvas.SetActive ( false );
-        player.transform.position = new Vector3 ( -2, 0, 0 );
-
-        weapon.transform.SetParent ( player.Entity.HeldPivot.transform );
-        weapon.Entity.ChangeState ( EntityState.Held );
-        player.Entity.Canvas.SetActive ( false );
-        weapon.transform.localPosition = new Vector3 ( 0, 0, 0 );
-
-        player2.transform.SetParent( GameEntities.transform );
-        player2.Entity.ChangeState ( EntityState.Defending );
-        player.Entity.Canvas.SetActive ( false );
-        player2.transform.position = new Vector3 ( 2, 0, 0 );
-
-        referee.transform.SetParent( GameEntities.transform );
-        referee.Entity.ChangeState ( EntityState.Refereeing );
-        player.Entity.Canvas.SetActive ( false );
-        referee.transform.position = new Vector3 ( 0, 1, 0 );
     }
 
     public void RetryGame () {
-        player.DisableActions ();
-        hud.SetScrolling ( scrollSpeed: Vector2.zero );
-
         ResetGameEntities ();
 
         StartGame ();
     }
 
-    void OnTutorialTimerFinished () => hud.Tutorial.SetActive ( false );
 
-    void ChangeThrowDirection () {
-        throwDirection = throwDirection != Vector2.right ? Vector2.right : Vector2.left;
+    void SetDifficulty () {
+        switch ( ( int ) currentPlaythroughTime ) {
+            case 0:
+                weapon.Entity.MoveSpeed = 2.0f;
+                player2.Entity.MoveSpeed = 1.0f;
+                referee.Entity.MoveSpeed = 1.5f;
+                soundsMain.inGameMusic.pitch = 1.0f;
+                break;
+            
+            case 30:
+                weapon.Entity.MoveSpeed = 2.0f + 0.05f;
+                player2.Entity.MoveSpeed = 1.0f + 0.05f;
+                referee.Entity.MoveSpeed = 1.5f + 0.05f;
+                soundsMain.inGameMusic.pitch = 1.0f + 0.05f;
+                break;
+            
+            case 45:
+                weapon.Entity.MoveSpeed = 2.0f + 0.05f + 0.05f;
+                player2.Entity.MoveSpeed = 1.0f + 0.05f + 0.05f;
+                referee.Entity.MoveSpeed = 1.5f + 0.05f + 0.05f;
+                soundsMain.inGameMusic.pitch = 1.0f + 0.05f + 0.05f;
+                break;
 
-        hud.SetScrolling ( scrollSpeed: throwDirection );
+            case 60:
+                weapon.Entity.MoveSpeed = 2.0f + 0.05f + 0.05f + 0.05f;
+                player2.Entity.MoveSpeed = 1.0f + 0.05f + 0.05f + 0.05f;
+                referee.Entity.MoveSpeed = 1.5f + 0.05f + 0.05f + 0.05f;
+                soundsMain.inGameMusic.pitch = 1.0f + 0.05f + 0.05f + 0.05f;
+                break;
+            
+            case 120:
+                weapon.Entity.MoveSpeed = 2.0f + 0.05f + 0.05f + 0.05f + 0.05f;
+                player2.Entity.MoveSpeed = 1.0f + 0.05f + 0.05f + 0.05f + 0.05f;
+                referee.Entity.MoveSpeed = 1.5f + 0.05f + 0.05f + 0.05f + 0.05f;
+                soundsMain.inGameMusic.pitch = 1.0f + 0.05f + 0.05f + 0.05f + 0.05f;
+                break;
+            
+            case 180:
+                weapon.Entity.MoveSpeed = 2.0f + 0.05f + 0.05f + 0.05f + 0.05f + 0.05f;
+                player2.Entity.MoveSpeed = 1.0f + 0.05f + 0.05f + 0.05f + 0.05f + 0.05f;
+                referee.Entity.MoveSpeed = 1.5f + 0.05f + 0.05f + 0.05f + 0.05f + 0.05f;
+                soundsMain.inGameMusic.pitch = 1.0f + 0.05f + 0.05f + 0.05f + 0.05f + 0.05f;
+                break;
+            
+            default:
+                break;
+        }
     }
 
-    void OnDestroy () {
-        Entity.OnEntityHitAction -= ChangeThrowDirection;
+    void SetNewGameParams () {
+        currentExchangeIndex = 0;
+        currentDialogueIndex = 0;
+        PlayerHealth = 20;
+        hud.HealthBarSlider.maxValue = PlayerHealth;
+        currentPlaythroughTime = 0;
+        ChangeThrowDirection ( Vector2.right );
+        IsExchangePlaying = false;
+    }
+
+    void ResetGameEntities () {
+        player.Entity.Reset (
+            parent: GameEntities.transform,
+            state: EntityState.Attacking,
+            position: new Vector3 ( -2, 0, 0 ),
+            CurrentHolder: null,
+            CurrentHeld: weapon.Entity
+        );
+        
+        weapon.Entity.Reset (
+            parent: player.Entity.HeldPivot.transform,
+            state: EntityState.Held,
+            position: new Vector3 ( 0, 0, 0 ),
+            CurrentHolder: player.Entity,
+            CurrentHeld: null
+        );
+        
+        player2.Entity.Reset (
+            parent: GameEntities.transform,
+            state: EntityState.Defending,
+            position: new Vector3 ( 2, 0, 0 ),
+            CurrentHolder: null,
+            CurrentHeld: null
+        );
+        
+        referee.Entity.Reset (
+            parent: GameEntities.transform,
+            state: EntityState.Refereeing,
+            position: new Vector3 ( 0, 1, 0 ),
+            CurrentHolder: null,
+            CurrentHeld: null
+        );
+    }
+
+    void OnTutorialTimerFinished () => hud.Tutorial.SetActive ( false );
+
+    public void ChangeThrowDirection ( Vector2 throwDir ) {
+        Vector3 xDir;
+
+        if ( throwDir == Vector2.zero )
+            throwDirection = throwDirection != Vector2.right ? Vector2.right : Vector2.left;
+        else
+            throwDirection = throwDir;
+        
+        if ( throwDirection == Vector2.right ) {
+            ParticleSystem.transform.position = new Vector3 ( 3.5f, 0, 0 );
+            ParticleSystem.transform.rotation = Quaternion.Euler ( 180, 90, -90 );
+
+            xDir = new Vector3 ( 1, 1, 1 );
+        }
+        else {
+            ParticleSystem.transform.position = new Vector3 ( -3.5f, 0, 0 );
+            ParticleSystem.transform.rotation = Quaternion.Euler ( 0, 90, -90 );
+
+            xDir = new Vector3 ( -1, 1, 1 );
+        }
+
+        hud.SetScrolling ( scrollSpeed: throwDirection / 10 );
+
+        foreach ( Entity entity in new Entity[] { player.Entity, weapon.Entity, player2.Entity, referee.Entity } ) {
+            entity.transform.localScale = xDir;
+            entity.Canvas.transform.localScale = xDir;
+        }
     }
 }

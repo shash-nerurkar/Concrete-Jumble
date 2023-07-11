@@ -3,61 +3,61 @@ using UnityEngine;
 public class Player2 : Hittable
 {
     public Entity Entity;
+    public Timer attackTimer;
 
     private Vector3 destinationPosition;
-    private Vector3 destinationDirection;
 
-    private Timer attackTimer;
 
     void Awake () {
         destinationPosition = transform.position;
-
-        attackTimer = gameObject.AddComponent<Timer> ();
     }
 
     void OnAttackTimerFinish () {
-        if ( Random.Range ( 0, 1 ) < 0.5f )
-            Entity.Throw ( startDirection: Vector2.zero );
+        switch ( Entity.State ) {
+            case EntityState.Attacking:
+                if ( transform.position.y > -Main.ScreenHeightHalved && transform.position.y < ( Main.ScreenHeightHalved * 0.66f ) - 0.5f )
+                    Entity.Throw ( startDirection: Vector2.zero );
+                
+                destinationPosition = new Vector2 ( transform.position.x, Random.Range ( -Main.ScreenHeightHalved, ( Main.ScreenHeightHalved * 0.66f ) - 0.5f ) );
 
-        destinationPosition = new Vector2 ( transform.position.x, Random.Range ( -Main.ScreenHeightHalved, Main.ScreenHeightHalved ) );
+                break;   
+
+            case EntityState.Refereeing:
+                destinationPosition = new Vector2 ( transform.position.x, Random.Range ( Main.ScreenHeightHalved * 0.66f, Main.ScreenHeightHalved ) );
+
+                break;
+            
+            case EntityState.Defending:
+            case EntityState.Held:
+            default:
+                break;        
+        }
     }
 
     void FixedUpdate () {
         switch ( Entity.State ) {
             case EntityState.Attacking:
                 if ( !attackTimer.IsRunning || attackTimer.TimeRemaining == 0 )
-                    attackTimer.StartTimer ( maxTime: Random.Range ( 0, 1 ), onTimerFinish: OnAttackTimerFinish );
+                    attackTimer.StartTimer ( maxTime: Random.Range ( 0, 3 ), onTimerFinish: OnAttackTimerFinish );
                 
-                // print(
-                //     "Vector2.Distance ( transform.position, destinationPosition ): " + Vector2.Distance ( transform.position, destinationPosition ) +
-                //     " | attackTimer.TimeRemaining: " + attackTimer.TimeRemaining
-                // );
-                if ( Vector2.Distance ( transform.position, destinationPosition ) <= 1 ) {
-                    destinationDirection = ( destinationPosition - transform.position ).normalized;
+                if ( Vector2.Distance ( transform.position, destinationPosition ) > 0.1f ) {
+                    Entity.Velocity = ( destinationPosition - transform.position ).normalized * Time.deltaTime;
 
                     transform.position = new Vector3 (
                         transform.position.x,
-                        transform.position.y + destinationDirection.y * Entity.MoveSpeed * Time.deltaTime, 
+                        transform.position.y + Entity.Velocity.y * Entity.MoveSpeed, 
                         0
                     );
                 }
-                // Entity.Rigidbody.AddForce ( new Vector2 ( 0, destinationPosition.y * Entity.MoveSpeed ) * Time.deltaTime );
-                
-                break;
-            
-            case EntityState.Refereeing:
-                if ( Vector2.Distance ( transform.position, destinationPosition ) <= 0.1f ) {
-                    destinationPosition = new Vector2 ( transform.position.x, Random.Range ( 0, Main.ScreenHeightHalved ) );
-                }
 
-                destinationDirection = ( destinationPosition - transform.position ).normalized;
-                
+                break;
+
+            case EntityState.Refereeing:
                 transform.position = new Vector3 (
                     transform.position.x,
-                    transform.position.y + destinationDirection.y * Entity.MoveSpeed * Time.deltaTime, 
+                    Main.ScreenHeightHalved, 
                     0
                 );
-                // Entity.Rigidbody.AddForce ( new Vector2 ( 0, destinationPosition.y * Entity.MoveSpeed ) * Time.deltaTime );
 
                 break;
             
@@ -69,21 +69,20 @@ public class Player2 : Hittable
                         destinationPosition = new Vector2 ( transform.position.x, - Main.ScreenHeightHalved );
                 }
 
-                destinationDirection = ( destinationPosition - transform.position ).normalized;
+                Entity.Velocity = ( destinationPosition - transform.position ).normalized * Time.deltaTime;
                 
                 transform.position = new Vector3 (
                     transform.position.x,
-                    transform.position.y + destinationDirection.y * Entity.MoveSpeed * Time.deltaTime, 
+                    transform.position.y + Entity.Velocity.y * Entity.MoveSpeed, 
                     0
                 );
-                // Entity.Rigidbody.AddForce ( new Vector2 ( 0, destinationPosition.y * Entity.MoveSpeed ) * Time.deltaTime );
 
                 break;
             
             case EntityState.Held:
             default:
-                break;
-            
+
+                break;        
         }
     }
 }

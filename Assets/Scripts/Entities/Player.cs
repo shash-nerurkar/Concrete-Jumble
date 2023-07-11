@@ -9,6 +9,12 @@ public class Player : Hittable
     [SerializeField] private InputAction moveAction;
     [SerializeField] private InputAction attackAction;
 
+    private bool IsInfected {
+        get {
+            return ( Entity.CurrentHeld != null && Entity.HeldPivot.childCount > 0 ) || Entity.CurrentHolder != null; 
+        }
+    }
+
     public void EnableActions () {
         moveAction.Enable ();
         attackAction.Enable ();
@@ -27,10 +33,18 @@ public class Player : Hittable
     }
 
     void Update() {
-        Vector3 moveDirection = moveAction.ReadValue<Vector2> ();
-        Vector3 nextPoint = transform.position + ( moveDirection * Entity.MoveSpeed * Time.deltaTime );
+        Entity.Velocity = moveAction.ReadValue<Vector2> () * Time.deltaTime;
+        Vector3 nextPoint = transform.position + Entity.Velocity * Entity.MoveSpeed;
         
-        // Entity.Rigidbody.MovePosition ( new Vector2 ( transform.position.x, Mathf.Clamp ( nextPoint.y, -Main.ScreenHeightHalved, Main.ScreenHeightHalved ) );
-        transform.position = new Vector3 ( transform.position.x, Mathf.Clamp ( nextPoint.y, -Main.ScreenHeightHalved, Main.ScreenHeightHalved ), 0 );
+        if ( transform.parent == Entity.main.GameEntities.transform )
+            transform.position = new Vector3 ( transform.position.x, Mathf.Clamp ( nextPoint.y, -Main.ScreenHeightHalved, Main.ScreenHeightHalved ), 0 );
+
+        if ( IsInfected )
+            Main.PlayerHealth -= Time.deltaTime;
+        
+        Entity.hud.HealthBarOutline.gameObject.SetActive ( IsInfected );
+
+        if ( Main.PlayerHealth <= 0 )
+            Entity.hud.OnGameEnded ();
     }
 }
