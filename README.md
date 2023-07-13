@@ -8,7 +8,7 @@
   <br />
   <br />
 
-  <img src="Assets/Resources/Sprites/HUD/title_name-logo.png" alt="intro" width='80%' height='auto'/>
+  <img src="Assets/Resources/Sprites/HUD/title_name-logo.png" alt="intro" width='auto' height='70%'/>
   <p align='justify'>
       Concrete Jumble is a top-down chaotic and goofy game about a street fight between a couple thugs.
       The hotheads are fighting as usual, with a green onlooker. Mr. Green guy has a weird glowing boomerang. He says it carries "boomerangiasis".
@@ -21,19 +21,19 @@
     
   <br />
   <p align='justify'></p>
-  <img src='Assets/Resources/Sprites/readme_game1.png' alt="story_1" width='auto' height='70%'/>
+  <img src='Assets/Resources/Sprites/readme_game1.png' alt="gameplay_1" width='auto' height='70%'/>
   
   <p align='justify'></p>
-  <img src='Assets/Resources/Sprites/readme_game2.png' alt="story_4" width='70%' height='auto'/>
+  <img src='Assets/Resources/Sprites/readme_game2.png' alt="gameplay_2" width='auto' height='70%'/>
   
   <p align='justify'></p>
-  <img src='Assets/Resources/Sprites/readme_game3.png' alt="story_3" width='70%' height='auto'/>
+  <img src='Assets/Resources/Sprites/readme_game3.png' alt="gameplay_3" width='auto' height='70%'/>
   
   <p align='justify'></p>
-  <img src='Assets/Resources/Sprites/readme_game4.png' alt="story_2" width='70%' height='auto'/>
+  <img src='Assets/Resources/Sprites/readme_game4.png' alt="gameplay_4" width='auto' height='70%'/>
   
   <p align='justify'></p>
-  <img src='Assets/Resources/Sprites/readme_endgame.png' alt="story_5" width='70%' height='auto'/>
+  <img src='Assets/Resources/Sprites/readme_endgame.png' alt="end_of_game" width='auto' height='70%'/>
 
   
   
