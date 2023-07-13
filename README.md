@@ -5,8 +5,6 @@
   <br />
   <a href='https://stashatstake.itch.io/concrete-jumble'>Link to play</a>
   
-  <br />
-  <br />
 
   <img src="Assets/Resources/Sprites/HUD/title_name-logo.png" alt="intro" width='auto' height='70%'/>
   <p align='justify'>
