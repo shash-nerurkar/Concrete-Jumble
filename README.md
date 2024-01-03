@@ -1,7 +1,8 @@
 # Concrete Jumble
   This game was made as a submission to the GMTK Game Jam 2023.
   <br />
-  <a href='https://www.youtube.com/watch?v=oxdO2_ccgTQ'>Trailer</a>
+  <br />
+  <a href='https://youtu.be/7yyRZtl9un8'>Trailer</a>
   <br />
   <a href='https://stashatstake.itch.io/concrete-jumble'>Link to play</a>
   
